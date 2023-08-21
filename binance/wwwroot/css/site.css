@@ -1,0 +1,184 @@
+﻿html {
+    height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+
+body {
+    /*    margin-bottom: 60px;*/
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: #EAECEF;
+}
+
+html, body {
+    font-family: 'Poppins', Arial;
+    /*    font-size: 14px;*/
+    background-color: #212529;
+}
+
+.navbar-brand {
+    font-size: 25px;
+    letter-spacing: 5px;
+    font-weight: bolder;
+    color: #EEC402;
+    padding-left: 10px;
+}
+
+nav {
+    background-color: none;
+    /*    box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;*/
+    box-shadow: 0 0 0 0.1rem #9fa3a9;
+}
+
+.search,
+.searchCryptoList {
+    border-radius: 8px 0 0 8px;
+    border: 1px solid rgb(94, 102, 115);
+    /*    background-color: #212529;*/
+    background-color: rgb(94, 102, 115);
+    width: 100%;
+}
+
+    ::placeholder {
+        color: #bdc2c7;
+    }
+
+.searchIcon {
+    background-color: #f0d041;
+    border-radius: 0 8px 8px 0;
+    justify-content: center;
+    border: none;
+}
+
+.searchCryptoList {
+    border-radius: 15px;
+    padding-left: 12px;
+    font-size: 13px;
+}
+
+.favourite {
+    border-radius: 5px;
+    padding: 8px 20px;
+    background-color: #f0d041;
+    border: 1px solid #f0d041;
+    font-weight: bold;
+    font-family: Arial;
+    font-size: 14px;
+}
+
+.star {
+    visibility: hidden;
+    font-size: 20px;
+    cursor: pointer;
+    color: #EAECEF;
+}
+
+    .star:before {
+        content: "\2606";
+        position: absolute;
+        visibility: visible;
+        color: #EAECEF;
+    }
+
+    .star:checked:before {
+        content: "\2605";
+        position: absolute;
+        color: #eeac00;
+    }
+
+.table {
+    color: #EAECEF;
+}
+
+table tbody tr {
+    padding: 15px 0;
+}
+
+    table tbody tr td {
+        vertical-align: central;
+        color: #EAECEF;
+    }
+
+table thead.depth tr th,
+table thead.trade tr th {
+    font-size: 11px;
+}
+
+table thead tr th.fr {
+    text-align: right;
+    padding-right: 0;
+}
+
+table thead tr th.fl {
+    padding-left: 0;
+    text-align: left;
+}
+
+table tbody.depthBody tr td,
+table tbody.tradeBody tr td {
+    font-size: 11px;
+    padding: 0;
+    text-align: right;
+    color: #EAECEF;
+}
+
+table tbody.askData tr td.price {
+    color: rgb(246, 70, 93);
+}
+
+table tbody.bidData tr td.price {
+    color: rgb(14, 203, 129);
+}
+
+table tbody.bidData tr td.price,
+table tbody.askData tr td.price,
+table tbody.tradeBody tr td.price {
+    text-align: left;
+}
+
+
+.site-footer {
+    margin-top: auto;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.tableFixHead {
+    overflow: auto;
+    height: 330px;
+    width: 100%;
+}
+
+
+
+div.lists {
+    position: relative;
+    width: 307px;
+}
+
+table tbody.bidData tr td,
+table tbody.askData tr td,
+table tbody.tradeBody tr td,
+table tbody.cryptoList tr td {
+    width: 100px; /* Hücre genişliğini sabit bir değere ayarlayın */
+    overflow: hidden; /* İçerik taşarsa gizlemek için */
+    white-space: nowrap; /* İçerik bir satırda durması için */
+    text-overflow: ellipsis;
+}
+
+#myTable tr td {
+    width: 300px;
+}

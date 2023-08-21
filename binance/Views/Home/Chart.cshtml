@@ -1,0 +1,412 @@
+﻿@model List<CryptoDetails>
+
+@* ------------- Crypto Header Start-------------*@
+<div class="row mb-3" style="height: 50px; border-bottom: 1px solid #42464b;">
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-4 col-sm-12">
+                <div class="left">
+                    <div id="cryptoSymbolHeader" class="cryptoSymbolHeader" style="display:flex; flex-direction:row; justify-content:space-between;">
+                        <div>
+                            <h4 class="symbolHeader" id="symbolHeader" style="font-weight:bold;"></h4>
+                        </div>
+                        <div>
+                            <p class="priceHeader pe-5" id="priceHeader"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8 col-sm-12" style="font-size:12px;display:inline-flex;">
+                <div style="display:flex; flex-direction:column; line-height:10px;">
+                    <div>
+                        <p style="font-weight:bold;">24h Change</p>
+                        <p id="24hChange"></p>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: column; line-height: 10px; padding-left: 25px;">
+                    <p style="font-weight:bold;">24h High</p>
+                    <p id="24hHigh"></p>
+                </div>
+                <div style="display: flex; flex-direction: column; line-height: 10px; padding-left: 25px;">
+                    <p style="font-weight:bold;">24h Low</p>
+                    <p id="24hLow"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 p-2 col-sm-12" style=" text-align:right;">
+        <input id="searchCrypto" type="text" placeholder="Search.." class="searchCryptoList" style="width: 280px;">
+    </div>
+</div>
+@* ------------- Crypto Header End-------------*@
+
+
+<div class="row" style="margin-bottom: 6%; justify-content: space-between;">
+    <div class="col-md-3 col-sm-12 lists">
+        @*-------------Asks List Start-------------*@
+        <div class="row" style="height:350px;">
+            <div class="col-md-12 col-sm-12 ps-2">
+                <table class="table table-dark table-striped">
+                    <thead class="depth">
+                        <tr>
+                            <th scope="col" class="fl">Price</th>
+                            <th scope="col" class="fr">Amount</th>
+                            <th scope="col" class="fr">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="askData" class="depthBody askData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @*-------------Asks List End-------------*@
+
+        @*-------------Bids List Start-------------*@
+        <div class="row" style="height:350px;">
+            <div class="col-md-12 col-sm-12 ps-2">
+                <p style="font-size:16px; font-weight:bold; height:20px;" class="" id="cryptoPrice"></p>
+                <table class="table table-dark table-striped">
+                    <thead class="depth">
+                        <tr>
+                            <th scope="col" class="fl">Price</th>
+                            <th scope="col" class="fr">Amount</th>
+                            <th scope="col" class="fr">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bidData" class="depthBody bidData">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @*-------------Bids List End-------------*@
+    </div>
+
+
+    @*-------------Cripto Graph Start-------------*@
+    <div class="col-md-6 col-sm-12">
+        <div class="tradingview-widget-container">
+            <div id="tradingview_dd585"></div>
+        </div>
+    </div>
+    @*-------------Cripto Graph End-------------*@
+
+
+    <div class="col-md-3 col-sm-12 lists">
+        @*-------------Cripto List Start-------------*@
+        <div class="row" style="height:350px;">
+            <div class="col-md-12 pe-2 tableFixHead">
+                <table class="table table-dark table-striped">
+                    <thead class="trade" style="position: sticky; top: 0px; background-color: rgb(11, 14, 17);">
+                        <tr>
+                            <th scope="col" class="fl">Pair</th>
+                            <th scope="col" class="fr">Price</th>
+                            <th scope="col" class="fr">Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cryptoList" class="tradeBody">
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td style="text-align: left;"><a style="text-decoration: none; color: #EAECEF;" href="/Home/Chart?symbol=@item.Symbol">@item.Symbol</a></td>
+                                <td id="price-@item.Id">@item.Price</td>
+                                <td id="change-@item.Id"></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @*-------------Cripto List End-------------*@
+
+        @*-------------Market Trades Start-------------*@
+        <div class="row" style="height:350px;">
+            <div class="col-md-12 col-sm-12 pe-2">
+                <p style="font-size:13px; font-weight:bold;" class="mb-1">Market Trades</p>
+                <table class="table table-dark table-striped">
+                    <thead class="trade">
+                        <tr>
+                            <th scope="col" class="fl" id="quotePrice">Price</th>
+                            <th scope="col" class="fr" id="baseAmount">Amount</th>
+                            <th scope="col" class="fr">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradeTable" class="tradeBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @*-------------Market Trades End-------------*@
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script type="text/javascript">
+    var cryptoSymbol = location.search.split('symbol=')[1]
+
+    @* ------------- Crypto Header Start-------------*@
+
+    const socketTicker = new WebSocket("wss://stream.binance.com:9443/ws/" + cryptoSymbol.toLowerCase() + "@@ticker_1d");
+    socketTicker.onmessage = async (event) => {
+        const tickerData = JSON.parse(event.data);
+        updateHeader(tickerData);
+    }
+    function updateHeader(ticker) {
+        var header = document.getElementById('priceHeader');
+        var list = document.getElementById('cryptoPrice');
+        const arrow = document.createElement('span');
+        if (header.textContent > ticker.c) {
+            header.style.color = 'rgb(246, 70, 93)';
+            list.style.color = 'rgb(246, 70, 93)';
+            arrow.innerHTML = `<span class="material-symbols-outlined" style="color:rgb(246, 70, 93);"> arrow_downward</span>`;
+        } else if (header.textContent < ticker.c) {
+            header.style.color = 'rgb(14, 203, 129)';
+            list.style.color = 'rgb(14, 203, 129)';
+            arrow.innerHTML = `<p class="material-symbols-outlined" style="color:green;">arrow_upward </p>`;
+        } else {
+            arrow.innerHTML = `<p></p>`;
+        }
+        header.textContent = parseFloat(ticker.c);
+        list.textContent = parseFloat(ticker.c);
+        list.appendChild(arrow);
+
+
+        var hChange = document.getElementById('24hChange');
+        hChange.textContent = parseFloat(ticker.P).toFixed(2) + '%';
+
+        var hHigh = document.getElementById('24hHigh');
+        hHigh.textContent = parseFloat(ticker.h);
+
+        var hLow = document.getElementById('24hLow');
+        hLow.textContent = parseFloat(ticker.l);
+
+    }
+    @* ------------- Crypto Header End-------------*@
+
+
+    window.onload = function () {
+        var cryptoSymbol = location.search.split('symbol=')[1]; // URL'den sembol değerini alın
+
+        var header = document.getElementById('symbolHeader'); // Başlık elementini id ile seçin
+        header.textContent = cryptoSymbol; // Sembolü başlık içeriğine ekleyin
+    };
+
+
+    @* ------------- Crypto Graph Start-------------*@
+    new TradingView.widget(
+        {
+            "width": 730,
+            "height": 480,
+            "symbol": "BINANCE:" + cryptoSymbol,
+            "interval": "D",
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "en",
+            "backgroundColor": "#212529",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_dd585"
+        }
+    );
+    @* ------------- Crypto Graph End-------------*@
+
+    @* ------------- Asks and Bids List Start -------------*@
+    const socketDepth = new WebSocket("wss://stream.binance.com:9443/ws/" + cryptoSymbol.toLowerCase() + "@@depth20");
+
+
+    // Son 15 veriyi saklamak için dizi oluştur
+    const bidData = [];
+    const askData = [];
+    socketDepth.onmessage = async (event) => {
+        const depthData = JSON.parse(event.data);
+
+
+        // Verileri güncelle ve son 15 veriyi sakla
+        updateData(bidData, depthData.bids);
+        updateData(askData, depthData.asks);
+
+
+        // Son 15 veriyi kullanarak tabloyu güncelle
+        renderDepthTable(bidData, askData);
+    };
+
+    function updateData(dataArray, newData) {
+        // Diziyi güncelle ve son 15 veriyi koru
+        dataArray.push(newData);
+        if (dataArray.length > 17) {
+            dataArray.shift();
+        }
+    }
+    function renderDepthTable(bids, asks) {
+        const bidDataElement = document.getElementById('bidData');
+        const askDataElement = document.getElementById('askData');
+        bidDataElement.innerHTML = '';
+        askDataElement.innerHTML = '';
+
+        for (let i = 0; i < 17; i++) {
+            const bidRow = bids[bids.length-1];
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="price">${parseFloat(bidRow[i][0])}</td>
+                <td>${parseFloat(bidRow[i][1])}</td>
+                <td>${parseFloat(bidRow[i][1] * bidRow[i][0]).toFixed(3)}</td>
+            `;
+
+            bidDataElement.appendChild(row);
+        }
+        for (let i = 16; i >= 0; i--) {
+            const askRow = asks[asks.length - 1];
+            const row2 = document.createElement('tr');
+            row2.innerHTML = `
+                <td class="price">${parseFloat(askRow[i][0])}</td>
+                <td>${parseFloat(askRow[i][1])}</td>
+                <td>${parseFloat(askRow[i][1] * askRow[i][0]).toFixed(3)}</td>
+            `;
+            askDataElement.appendChild(row2);
+        }
+
+    }
+    @* ------------- Asks and Bids List End-------------*@
+
+
+    @* ------------- Market Trades List Start-------------*@
+    const socketTrades = new WebSocket("wss://stream.binance.com:9443/ws/" + cryptoSymbol.toLowerCase() + "@@trade");
+    socketTrades.onmessage = async (event) => {
+        const tradeData = JSON.parse(event.data);
+
+        updateTradeTable(tradeData);
+    }
+    function updateTradeTable(trade) {
+        const tableBody = document.querySelector('#tradeTable');
+        const newRow = document.createElement('tr');
+        const time = new Date(trade.T);
+        if (trade.m == true) {
+            newRow.innerHTML = `
+            <td class="price" style="color:rgb(246, 70, 93);">${parseFloat(trade.p)}</td>
+            <td>${parseFloat(trade.q)}</td>
+            <td>${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}</td>`;
+        } else {
+            newRow.innerHTML = `
+            <td class="price" style="color:rgb(14, 203, 129);">${parseFloat(trade.p)}</td>
+            <td>${parseFloat(trade.q)}</td>
+            <td>${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}</td>`;
+        }
+
+        tableBody.insertBefore(newRow, tableBody.firstChild);
+
+        // En fazla 20 satırı koru
+        if (tableBody.children.length > 15) {
+            tableBody.removeChild(tableBody.lastChild);
+        }
+    }
+    @* ------------- Market Trades List Start-------------*@
+
+
+    @* ------------- Crypto List Start-------------*@
+
+    function updateCryptoList() {
+        $.ajax({
+            url: '/Home/GetUpdatedCryptoPricesAndChanges',
+            method: 'GET',
+            success: function (data) {
+                // "data" içerisinde güncellenmiş fiyat verileri bulunur
+                for (var i = 0; i < data.length; i++) {
+                    var crypto = data[i];
+                    var priceCell = document.getElementById('price-' + crypto.Id);
+                    var changeCell = document.getElementById('change-' + crypto.Id);
+
+                    if (crypto.PriceChangePercentage > 0) {
+                        changeCell.textContent = crypto.PriceChangePercentage.toFixed(2) +'%';
+                        changeCell.style.color = 'rgb(14, 203, 129)'; // Alış yapıldıysa yeşil
+
+                    } else if (crypto.PriceChangePercentage < 0) {
+                        changeCell.textContent = crypto.PriceChangePercentage.toFixed(2) + '%';
+                        changeCell.style.color = 'rgb(246, 70, 93)'; // Satış yapıldıysa kırmızı
+
+                    } else {
+                        changeCell.textContent = '0%';
+                    }
+                    priceCell.textContent = crypto.Price;
+                }
+            }
+        });
+    }
+    setInterval(updateCryptoList, 3000);
+
+
+    //function updateIsolatedSymbols() {
+    //    $.ajax({
+    //        url: '/Home/GetIsolatedSymbols',
+    //        method: 'GET',
+    //        data: { symbol: cryptoSymbol },
+    //        success: function (result) {
+    //        console.log(cryptoSymbol);
+    //            console.log(result);
+    //            //const quotePrice = document.getElementById("quotePrice");
+    //            //quotePrice.textContent = "Price (" + result.Data.quote + ")";
+    //        }
+    //    });
+    //}
+    //updateIsolatedSymbols();
+
+    //const socketTickers = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
+
+    //const cryptoData = {};
+    //socketTickers.onmessage = (event) => {
+    //    const tickerData = JSON.parse(event.data);
+
+    //    tickerData.forEach(item => {
+    //        if (item !== null && item.s && item.c && item.P) {
+    //            const symbol = item.s;
+    //            cryptoData[symbol] = { symbol: symbol, price: item.c, priceChange: item.P };
+    //        }
+    //    });
+
+    //    renderCryptoTable();
+    //};
+
+    //function renderCryptoTable() {
+    //    const tableBody = document.getElementById('cryptoList');
+    //    tableBody.innerHTML = '';
+    //    const sortedSymbols = Object.keys(cryptoData).sort();
+    //    // Referans sıraya göre verileri sırala ve tabloya ekle
+    //    sortedSymbols.forEach(symbol => {
+    //        const item = cryptoData[symbol];
+    //        const row = document.createElement('tr');
+    //        if ((item.priceChange).substring(0, 1) == "-") {
+    //            row.innerHTML = `
+    //                <td style="text-align: left;"><a style="text-decoration:none; color:black;" href="/Home/Chart?symbol=${item.symbol}">${item.symbol}</a></td>
+    //                <td>${parseFloat(item.price)}</td>
+    //                <td style="color:#cd141e;">${parseFloat(item.priceChange).toFixed(2)}%</td>
+    //            `;
+    //        } else if ((item.priceChange).substring(0, 1) != "-") {
+    //            row.innerHTML = `
+    //                <td style="text-align: left;"><a style="text-decoration:none; color:black;" href="/Home/Chart?symbol=${item.symbol}">${item.symbol}</a></td>
+    //                <td>${parseFloat(item.price)}</td>
+    //                <td style="color:#37b314;">${parseFloat(item.priceChange).toFixed(2)}%</td>
+    //            `;
+    //        }
+
+
+    //        tableBody.appendChild(row);
+    //    });
+    //}
+
+
+    @* ------------- Crypto List End-------------*@
+
+
+    $(document).ready(function () {
+        $("#searchCrypto").on("keyup", function () { //input kısmında "keyup" ile basılan tuşları al
+            var value = $(this).val().toLowerCase();  //girilen yazıyı küçük harfle olacak şekilde ayarla
+            $("#cryptoList tr").filter(function () { //tablodaki verilerde girilen yazıyı ara
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+    });
+
+</script>
+

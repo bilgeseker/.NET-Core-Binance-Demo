@@ -1,0 +1,160 @@
+﻿@model List<CryptoDetails>
+@{
+    ViewData["Title"] = "Index";
+}
+@{Html.BeginForm("Index", "Home", new { showFavorites = true }, FormMethod.Post);}
+@*ekran çıktısı şöyle olacaktır
+    <form action="/Home/Index?ShowFavorites=true" method="post">..</form> *@
+<div class="row mb-3 justify-content-end">
+    <div class="col-md-4">
+        <div class="row input-group mb-2 ms-0 justify-content-end">
+            <div class="col-md-8 me-0 p-0">
+                <input id="myInput" type="text" placeholder="Search.." class="search">
+            </div>
+            <div class="col-md-2 ms-0 p-0 justify-content-end">
+                <span class="input-group-text searchIcon" id="basic-addon1">
+                    <i class="fa fa-search"></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="row justify-content-end">
+            <div class="col-md-4" style="text-align:end;">
+                @if (@Context.Request.Query["showFavorites"].ToString() == "True")
+                {
+                    <a class="btn favourite" href='javascript:history.go(-1)'>Return</a>
+                }
+                else
+                {
+                    <button type="submit" class="btn favourite" id="Favorites">Favorites</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row float-none">
+    <div class="col-md-12" style="margin-top:2%;">
+        <table class="table table-dark table-striped" style="text-align:center;">
+            <thead>
+                <tr>
+                    @*<th scope="col">ID</th>*@
+                    <th scope="col">Symbol</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">24h Change</th>
+                    <th scope="col">Favourite</th>
+                </tr>
+            </thead>
+            <tbody class="table-group-divider" id="myTable">
+                @foreach (var crypto in Model)
+                {
+                    <tr>
+                        @*<th scope="row">@crypto.Id</th>*@
+                        <td id="symbol"><a style="text-decoration: none; color: #EAECEF;" href="/Home/Chart?symbol=@crypto.Symbol">@crypto.Symbol</a></td>
+                        <td id="price-@crypto.Id">@crypto.Price</td>
+                        <td id="change-@crypto.Id"></td>
+                        <td>
+                            <input class="form-check-input mt-0 star" type="checkbox" id="@crypto.Id" value="@crypto.Symbol"
+                                   name="@crypto.Symbol" @Html.Raw((crypto.IsFavourite == 1) ? "checked" : "")
+                                   onclick="favorite(@crypto.Id, crypto.Symbol)">
+                        </td>
+                        @*eğer kripto favorilenmişse tag'a checked yazacak, favorilenmemişse bir şey yazmayacak
+                            kutuya tıklandığında scriptteki favorite() fonksiyonunu çalıştıracak'*@
+                    </tr>
+
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@{Html.EndForm();}
+
+<script>//function deneme() {
+    //    debugger;
+    //    console.log(favoritesId);
+    //}
+
+    //$(document).ready(function deneme() {
+    //    debugger;
+
+    //    favoritesId = localStorage.getItem('favorites');
+
+    //    if (favoritesId == null)
+    //        favoritesId = [];
+    //});
+    function favorite(id) {
+        var favoriteItem = document.getElementById(id);
+
+        $.ajax({
+            type: "POST",
+            url: '/Home/ManageFavList',
+            data: { id:id, symbol: favoriteItem.name, isFavorite: favoriteItem.checked },
+            success:
+                function (response) {
+
+                },
+            error:
+                function (response) {
+                    alert("Error: " + response);
+                }
+        });
+        localStorage.setItem('favorites', favoritesId);
+
+    }
+
+    function updateCryptoPrices() {
+        $.ajax({
+            url: '@Url.Action("GetUpdatedCryptoPrices", "Home")',
+            method: 'GET',
+            success: function (data) {
+                // "data" içerisinde güncellenmiş fiyat verileri bulunur
+                for (var i = 0; i < data.length; i++) {
+                    var crypto = data[i];
+                    var priceCell = document.getElementById('price-' + crypto.Id);
+                    if (priceCell) {
+                        if (priceCell.textContent > crypto.Price) {
+                            priceCell.style.background = 'rgba(246, 70, 93, 0.5)';
+                            priceCell.style.color = 'white';
+                        } else if (priceCell.textContent < crypto.Price) {
+                            priceCell.style.background = 'rgba(14, 203, 129, 0.5)';
+                            priceCell.style.color = 'white';
+                        }
+                        priceCell.textContent = crypto.Price;
+                    }
+                }
+            }
+        });
+    }
+
+    // Belirli bir süre sonunda fonksiyonu çağırarak fiyatları güncelle
+    setInterval(updateCryptoPrices, 3000); //3 saniyede bir güncelleme yap
+
+
+    function updateCryptoChange() {
+        $.ajax({
+            url: '/Home/GetUpdatedCryptoPricesAndChanges',
+            method: 'GET',
+            success: function (data) {
+                for (var i = 0; i < data.length; i++) {
+                    var crypto = data[i];
+                    var changeCell = document.getElementById('change-' + crypto.Id);
+                    if (crypto.PriceChangePercentage > 0) {
+                        changeCell.textContent = crypto.PriceChangePercentage.toFixed(2) + '%';
+                        changeCell.style.color = 'rgb(14, 203, 129)'; // Alış yapıldıysa yeşil
+
+                    } else if (crypto.PriceChangePercentage < 0) {
+                        changeCell.textContent = crypto.PriceChangePercentage.toFixed(2) + '%';
+                        changeCell.style.color = 'rgb(246, 70, 93)'; // Satış yapıldıysa kırmızı
+
+                    } else {
+                        changeCell.textContent = '0%';
+
+                    }
+                }
+            }
+        });
+    }
+    setInterval(updateCryptoChange, 1000);
+</script>
+
