@@ -10,7 +10,7 @@ namespace binance.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseMySQL("server=localhost;database=crypto;user=root;password=crisscolfer1");
+            optionsBuilder.UseMySQL("server=localhost;database=crypto;user=root;password=xx");
         }
 
     }

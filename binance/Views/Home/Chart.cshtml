@@ -336,66 +336,6 @@
     }
     setInterval(updateCryptoList, 3000);
 
-
-    //function updateIsolatedSymbols() {
-    //    $.ajax({
-    //        url: '/Home/GetIsolatedSymbols',
-    //        method: 'GET',
-    //        data: { symbol: cryptoSymbol },
-    //        success: function (result) {
-    //        console.log(cryptoSymbol);
-    //            console.log(result);
-    //            //const quotePrice = document.getElementById("quotePrice");
-    //            //quotePrice.textContent = "Price (" + result.Data.quote + ")";
-    //        }
-    //    });
-    //}
-    //updateIsolatedSymbols();
-
-    //const socketTickers = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
-
-    //const cryptoData = {};
-    //socketTickers.onmessage = (event) => {
-    //    const tickerData = JSON.parse(event.data);
-
-    //    tickerData.forEach(item => {
-    //        if (item !== null && item.s && item.c && item.P) {
-    //            const symbol = item.s;
-    //            cryptoData[symbol] = { symbol: symbol, price: item.c, priceChange: item.P };
-    //        }
-    //    });
-
-    //    renderCryptoTable();
-    //};
-
-    //function renderCryptoTable() {
-    //    const tableBody = document.getElementById('cryptoList');
-    //    tableBody.innerHTML = '';
-    //    const sortedSymbols = Object.keys(cryptoData).sort();
-    //    // Referans sıraya göre verileri sırala ve tabloya ekle
-    //    sortedSymbols.forEach(symbol => {
-    //        const item = cryptoData[symbol];
-    //        const row = document.createElement('tr');
-    //        if ((item.priceChange).substring(0, 1) == "-") {
-    //            row.innerHTML = `
-    //                <td style="text-align: left;"><a style="text-decoration:none; color:black;" href="/Home/Chart?symbol=${item.symbol}">${item.symbol}</a></td>
-    //                <td>${parseFloat(item.price)}</td>
-    //                <td style="color:#cd141e;">${parseFloat(item.priceChange).toFixed(2)}%</td>
-    //            `;
-    //        } else if ((item.priceChange).substring(0, 1) != "-") {
-    //            row.innerHTML = `
-    //                <td style="text-align: left;"><a style="text-decoration:none; color:black;" href="/Home/Chart?symbol=${item.symbol}">${item.symbol}</a></td>
-    //                <td>${parseFloat(item.price)}</td>
-    //                <td style="color:#37b314;">${parseFloat(item.priceChange).toFixed(2)}%</td>
-    //            `;
-    //        }
-
-
-    //        tableBody.appendChild(row);
-    //    });
-    //}
-
-
     @* ------------- Crypto List End-------------*@
 
 

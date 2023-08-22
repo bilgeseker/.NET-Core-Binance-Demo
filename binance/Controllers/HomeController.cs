@@ -92,38 +92,6 @@ public class HomeController : Controller
 
     }
 
-
-    //[Route("/ws")]
-    //public async Task Get()
-    //{
-    //    if (HttpContext.WebSockets.IsWebSocketRequest)
-    //    {
-    //        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-    //        await ReceiveData(webSocket);
-    //    }
-    //    else
-    //    {
-    //        HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-    //    }
-    //}
-    //private async Task ReceiveData(WebSocket webSocket)
-    //{
-    //    var buffer = new byte[1024 * 4];
-    //    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-
-    //    while (!result.CloseStatus.HasValue)
-    //    {
-    //        // Burada gelen veriyi WebSocket üzerinden View'e iletebilirsiniz.
-    //        var data = Encoding.UTF8.GetString(buffer, 0, result.Count);
-
-    //        // Veriyi gerekli şekilde işleyin ve isteğe bağlı olarak View'e iletin.
-
-    //        result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-    //    }
-
-    //    await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-    //}
-
     [HttpGet]
     public async Task<ActionResult> GetUpdatedCryptoPricesAndChanges()
     {
@@ -157,23 +125,6 @@ public class HomeController : Controller
         var sortedCryptoDataList = veriListesi.OrderBy(crypto => crypto.Symbol).ToList();
         return View(sortedCryptoDataList);
     }
-
-
-    //public async Task<ActionResult> GetIsolatedSymbols(string symbol)
-    //{
-    //    try
-    //    {
-    //        var client = new BinanceRestClient();
-    //        var data = await client.SpotApi.ExchangeData.GetMarginSymbolAsync(symbol);
-
-    //        return Json(data, new System.Text.Json.JsonSerializerOptions());
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        // Hata durumlarını burada işleyin veya loglayın
-    //        return BadRequest("Veri alınamadı: " + ex.Message);
-    //    }
-    //}
 }
 
 
